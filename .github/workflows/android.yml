@@ -30,7 +30,15 @@ jobs:
       - name: Build APK
         working-directory: source
         run: gradle assembleDebug
-
+      - name: Check APK
+        working-directory: source
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          BT=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
+          echo "=== APK INFO ==="
+          "$ANDROID_HOME/build-tools/$BT/aapt" dump badging "$APK" | head -n 10
+          echo "=== APK SIGNATURE ==="
+          "$ANDROID_HOME/build-tools/$BT/apksigner" verify --verbose --print-certs "$APK"
       - name: Save APK
         uses: actions/upload-artifact@v4
         with:
